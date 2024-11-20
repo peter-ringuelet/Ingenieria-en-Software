@@ -1,8 +1,8 @@
 import React from "react";
-import { reviewsData } from "../data/reviews";
-import { renderStars } from "../utils/renderStars";
-import "../styles/theme.css"; 
-import "../styles/Reviews.css";
+import { reviewsData } from "../../data/reviews";
+import { renderStars } from "../Shared/renderStars";
+import "./Reviews.css";
+import "../../styles/theme.css";
 
 const Reviews = () => {
   return (

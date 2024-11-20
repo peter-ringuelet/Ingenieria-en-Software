@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Menu from "./components/Menu";
-import Restaurants from "./components/Restaurants";
-import Reviews from "./components/Reviews";
-import Profile from "./components/Profile"; // Nuevo componente
+import Menu from "./components/Menu/Menu";
+import Restaurants from "./components/Restaurants/Restaurants";
+import Reviews from "./components/Reviews/Reviews";
+import Profile from "./components/Profile/Profile";
 
 const App = () => {
   return (
@@ -17,7 +17,7 @@ const App = () => {
             <Route path="/" element={<Navigate to="/restaurants" replace />} />
             <Route path="/restaurants" element={<Restaurants />} />
             <Route path="/reviews" element={<Reviews />} />
-            <Route path="/profile" element={<Profile />} /> {/* Nueva ruta */}
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>
       </div>
@@ -30,6 +30,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     height: "100vh",
+    backgroundColor: "var(--background-dark)", // Fondo oscuro
   },
   viewContainer: {
     flex: 1,

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import { restaurantsData } from "../data/restaurants";
-import { renderStars } from "../utils/renderStars"; // Importar la función desde utils
-import "../styles/theme.css";
-import "../styles/Restaurants.css";
+import { restaurantsData } from "../../data/restaurants";
+import { renderStars } from "../Shared/renderStars"; // Importar la función desde utils
+import "../../styles/theme.css";
+import "./Restaurants.css";
+
 
 const restaurantIcon = (visited) =>
   new L.Icon({

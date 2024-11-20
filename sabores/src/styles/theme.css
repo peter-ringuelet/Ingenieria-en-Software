@@ -1,17 +1,37 @@
 /* Variables globales */
+/* Tema claro (por defecto) */
 :root {
-    --background-dark: #1a1a1a; /* Fondo principal */
-    --container-bg: #2c2c2c; /* Fondo de los contenedores */
-    --card-bg: #3c3c3c; /* Fondo de las tarjetas */
-    --text-primary: #ffffff; /* Texto principal */
-    --text-secondary: #cccccc; /* Texto secundario */
-    --accent-color: #e67e22; /* Naranja */
-    --shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
-  }
+  --background-dark: #f8f9fa;
+  --container-bg: #ffffff;
+  --card-bg: #f2f2f2;
+  --background-light: #fafafa;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --accent-color: #ff7043;
+  --accent-hover: #ff8a65;
+  --active-color: #ff7043;
+  --inactive-color: #aaaaaa;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Tema oscuro */
+body.dark-mode {
+  --background-dark: #121212;
+  --container-bg: #1e1e1e;
+  --card-bg: #252525;
+  --background-light: #eaeaea;
+  --text-primary: #f4f4f4;
+  --text-secondary: #bdbdbd;
+  --accent-color: #ff8c42;
+  --accent-hover: #ffa766;
+  --active-color: #ff8c42;
+  --inactive-color: #7d7d7d;
+  --shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
   
   /* General */
   body {
-    background-color: var(--background-dark);
+    background-color: var(--background-light);
     color: var(--text-primary);
     font-family: 'Poppins', sans-serif;
     margin: 0;
@@ -19,5 +39,5 @@
   
 /* Estilo para las barras del menú (navbar-toggler-icon) */
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='white' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-  }
+  background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='white' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}

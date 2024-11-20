@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css"; // Si tienes estilos personalizados
+import "./styles/theme.css";
 import "bootstrap/dist/css/bootstrap.min.css"; // Bootstrap
 import "@fortawesome/fontawesome-free/css/all.min.css"; // FontAwesome
 import "leaflet/dist/leaflet.css"; // Leaflet

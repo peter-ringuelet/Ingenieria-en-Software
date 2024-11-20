@@ -47,15 +47,16 @@ const Menu = () => {
               </Link>
             </li>
           </ul>
-          {/* Toggle Switch para el tema */}
-          <div className="theme-toggle-switch">
-            <input
-              type="checkbox"
-              id="theme-switch"
-              checked={darkMode}
-              onChange={toggleTheme}
+          {/* Iconos para alternar tema */}
+          <div className="theme-toggle-icon" onClick={toggleTheme}>
+            <img
+              src={
+                darkMode
+                  ? "https://cdn-icons-png.flaticon.com/512/1046/1046747.png"
+                  : "/icons/food.png"
+              }
+              alt="Theme Toggle"
             />
-            <label htmlFor="theme-switch"></label>
           </div>
         </div>
       </div>

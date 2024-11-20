@@ -1,0 +1,58 @@
+/* Contenedor principal */
+.restaurants-container {
+    background-color: var(--container-bg); /* Fondo oscuro consistente */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    color: var(--text-primary);
+  }
+  
+  /* Título */
+  h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    text-align: center;
+  }
+  
+  /* Mapa */
+  .map-container {
+    height: 500px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--container-bg); /* Fondo del mapa */
+  }
+  
+  /* Texto de carga */
+  .text-secondary {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  /* Marcadores */
+  .marker-popup h5 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+  }
+  
+  .marker-popup p {
+    color: var(--text-secondary);
+  }
+
+/* Botones en el popup */
+.popup-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+  }
+  
+  .popup-buttons .btn {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+  
+  

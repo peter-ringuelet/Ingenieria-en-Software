@@ -1,0 +1,23 @@
+/* Variables globales */
+:root {
+    --background-dark: #1a1a1a; /* Fondo principal */
+    --container-bg: #2c2c2c; /* Fondo de los contenedores */
+    --card-bg: #3c3c3c; /* Fondo de las tarjetas */
+    --text-primary: #ffffff; /* Texto principal */
+    --text-secondary: #cccccc; /* Texto secundario */
+    --accent-color: #e67e22; /* Naranja */
+    --shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+  }
+  
+  /* General */
+  body {
+    background-color: var(--background-dark);
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+  }
+  
+/* Estilo para las barras del menú (navbar-toggler-icon) */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='white' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+  }

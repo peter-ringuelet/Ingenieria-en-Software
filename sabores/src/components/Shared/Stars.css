@@ -1,0 +1,36 @@
+/* Contenedor de estrellas */
+.stars-container {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Estilos generales para todas las estrellas */
+.star {
+    font-size: 24px;
+    /* Tamaño uniforme para todas las estrellas */
+    margin: 0 2px;
+    /* Espaciado entre las estrellas */
+    position: relative;
+}
+
+/* Estrella completa */
+.star-filled {
+    color: #ffc107;
+    /* Amarillo para estrellas llenas */
+}
+
+/* Media estrella */
+.star-half {
+    color: #ffc107;
+    /* Amarillo para la mitad llena */
+    background: linear-gradient(90deg, #ffc107 50%, #d3d3d3 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+}
+
+/* Estrella vacía */
+.star-empty {
+    color: #d3d3d3;
+    /* Gris claro para estrellas vacías */
+}

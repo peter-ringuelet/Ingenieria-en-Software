@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { restaurantsData } from "../../data/restaurants";
-import { renderStars } from "../Shared/renderStars"; // Importar la función desde utils
+import { renderStars } from "../Shared/renderStars";
 import "../../styles/theme.css";
 import "./Restaurants.css";
-
 
 const restaurantIcon = (visited) =>
   new L.Icon({
@@ -27,6 +26,19 @@ const locationIcon = new L.Icon({
 const Restaurants = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedMenu, setSelectedMenu] = useState(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const [reviewModal, setReviewModal] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    lugar: "",
+    comida: "",
+    abundancia: "",
+    sabor: "",
+    calidadPrecio: "",
+    limpieza: "",
+    atencion: "",
+    ambiente: "",
+  });
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -49,12 +61,37 @@ const Restaurants = () => {
     }
   }, []);
 
-  const handleReview = (restaurantName) => {
-    alert(`Hacer reseña para: ${restaurantName}`);
+  const handleMenu = (menu) => {
+    setSelectedMenu(menu);
   };
 
-  const handleMenu = (restaurantName) => {
-    alert(`Ver menú de: ${restaurantName}`);
+  const closeMenu = () => {
+    setSelectedMenu(null);
+  };
+
+  const openReviewModal = (restaurant) => {
+    setSelectedRestaurant(restaurant);
+    setReviewForm((prev) => ({
+      ...prev,
+      lugar: restaurant.name,
+      comida: "",
+    }));
+    setReviewModal(true);
+  };
+
+  const closeReviewModal = () => {
+    setReviewModal(false);
+    setSelectedRestaurant(null);
+  };
+
+  const handleReviewChange = (e) => {
+    const { name, value } = e.target;
+    setReviewForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submitReview = () => {
+    alert(`Reseña enviada:\n${JSON.stringify(reviewForm, null, 2)}`);
+    closeReviewModal();
   };
 
   return (
@@ -64,7 +101,7 @@ const Restaurants = () => {
         <p className="text-secondary">Cargando ubicación...</p>
       ) : (
         <MapContainer
-          center={[-34.8692, -58.0497]}
+          center={[location.lat, location.lng]}
           zoom={15}
           className="map-container"
         >
@@ -85,22 +122,29 @@ const Restaurants = () => {
             >
               <Popup>
                 <h5 className="text-accent">{restaurant.name}</h5>
-                <div>{renderStars(restaurant.rating)}</div>
+                {restaurant.visited ? (
+                  <div>
+                    {renderStars(restaurant.rating)}{" "}
+                    <span className="text-success">(Visitado)</span>
+                  </div>
+                ) : (
+                  <p className="text-danger">(No visitado)</p>
+                )}
                 <p><strong>Especialidad:</strong> {restaurant.specialty}</p>
                 <p><strong>Horario:</strong> {restaurant.hours}</p>
-                <p><strong>Rango de precios:</strong> {restaurant.priceRange}</p>
+                <p><strong>Teléfono:</strong> {restaurant.phone}</p>
                 <div className="d-flex justify-content-around mt-3">
                   <button
                     className="btn btn-primary"
-                    onClick={() => handleReview(restaurant.name)}
+                    onClick={() => handleMenu(restaurant.menu)}
                   >
-                    Hacer Reseña
+                    Ver Menú
                   </button>
                   <button
                     className="btn btn-secondary"
-                    onClick={() => handleMenu(restaurant.name)}
+                    onClick={() => openReviewModal(restaurant)}
                   >
-                    Ver Menú
+                    Hacer Reseña
                   </button>
                 </div>
               </Popup>
@@ -108,9 +152,88 @@ const Restaurants = () => {
           ))}
         </MapContainer>
       )}
+
+      {/* Modal para mostrar el menú */}
+      {selectedMenu && (
+        <div className="menu-modal">
+          <div className="menu-modal-content">
+            <h2 className="text-accent">Menú</h2>
+            {Object.entries(selectedMenu).map(([category, items]) => (
+              <div key={category}>
+                <h3>{category}</h3>
+                <ul>
+                  {items.map((item, index) => (
+                    <li key={index}>
+                      {item.name} - {item.price}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            <button className="btn btn-secondary" onClick={closeMenu}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para hacer la reseña */}
+      {reviewModal && (
+        <div className="menu-modal">
+          <div className="menu-modal-content">
+            <h2 className="text-accent">Hacer Reseña</h2>
+            <div className="menu-divider"></div>
+            <form>
+              <p><strong>Restaurante:</strong> {reviewForm.lugar}</p>
+              <label>Comida</label>
+              <select
+                name="comida"
+                value={reviewForm.comida}
+                onChange={handleReviewChange}
+              >
+                <option value="">Seleccionar comida</option>
+                {selectedRestaurant.menu &&
+                  Object.values(selectedRestaurant.menu).flat().map((item, idx) => (
+                    <option key={idx} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+              </select>
+              {["abundancia", "sabor", "calidadPrecio", "limpieza", "atencion", "ambiente"].map(
+                (field) => (
+                  <div key={field}>
+                    <label>{field}</label>
+                    <input
+                      type="number"
+                      name={field}
+                      min="1"
+                      max="5"
+                      value={reviewForm[field]}
+                      onChange={handleReviewChange}
+                    />
+                  </div>
+                )
+              )}
+              <button
+                type="button"
+                className="btn btn-primary mt-3"
+                onClick={submitReview}
+              >
+                Enviar Reseña
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary mt-3"
+                onClick={closeReviewModal}
+              >
+                Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Restaurants;
-

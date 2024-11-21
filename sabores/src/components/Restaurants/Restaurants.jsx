@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { restaurantsData } from "../../data/restaurants";
+import { getRestaurants, submitReview } from "../../services/api"; // Importamos las funciones necesarias
 import { renderStars } from "../Shared/renderStars";
 import { restaurantIcon, locationIcon } from "../../utils/mapIcons";
 import "../../styles/theme.css";
@@ -9,6 +9,7 @@ import "./Restaurants.css";
 const Restaurants = () => {
   const [location, setLocation] = useState({ lat: -34.854, lng: -58.043 });
   const [loading, setLoading] = useState(true);
+  const [restaurantsData, setRestaurantsData] = useState([]); // Estado para los restaurantes
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [reviewModal, setReviewModal] = useState(false);
@@ -24,6 +25,7 @@ const Restaurants = () => {
   });
 
   useEffect(() => {
+    // Obtener la ubicación del usuario
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -35,21 +37,41 @@ const Restaurants = () => {
         },
         (error) => {
           console.error("Error obteniendo la ubicación:", error);
-          // Usar coordenadas de City Bell por defecto
+          // Usar coordenadas por defecto
           setLocation({ lat: -34.854, lng: -58.043 });
           setLoading(false);
         }
       );
     } else {
       console.error("Geolocalización no soportada.");
-      // Usar coordenadas de City Bell por defecto
+      // Usar coordenadas por defecto
       setLocation({ lat: -34.854, lng: -58.043 });
       setLoading(false);
     }
   }, []);
 
-  const handleMenu = (menu) => {
-    if (menu) {
+  useEffect(() => {
+    // Obtener los restaurantes desde el backend
+    getRestaurants()
+      .then((data) => {
+        setRestaurantsData(data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los restaurantes:", error);
+      });
+  }, []);
+
+  const handleMenu = (menuItems) => {
+    if (menuItems && menuItems.length > 0) {
+      // Agrupar los items del menú por categoría
+      const menu = menuItems.reduce((acc, item) => {
+        const category = item.category;
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(item);
+        return acc;
+      }, {});
       setSelectedMenu(menu);
     }
   };
@@ -77,9 +99,31 @@ const Restaurants = () => {
     setReviewForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const submitReview = () => {
-    alert(`Reseña enviada:\n${JSON.stringify(reviewForm, null, 2)}`);
-    closeReviewModal();
+  const submitReviewHandler = () => {
+    if (!selectedRestaurant) {
+      return;
+    }
+
+    const reviewData = {
+      restaurant: selectedRestaurant.id,
+      comida: reviewForm.comida,
+      abundancia: reviewForm.abundancia,
+      sabor: reviewForm.sabor,
+      calidadPrecio: reviewForm.calidadPrecio,
+      limpieza: reviewForm.limpieza,
+      atencion: reviewForm.atencion,
+      ambiente: reviewForm.ambiente,
+    };
+
+    submitReview(reviewData)
+      .then(() => {
+        alert("Reseña enviada exitosamente");
+        closeReviewModal();
+      })
+      .catch((error) => {
+        console.error("Error al enviar la reseña:", error);
+        alert("Ocurrió un error al enviar la reseña.");
+      });
   };
 
   return (
@@ -103,7 +147,7 @@ const Restaurants = () => {
           {restaurantsData.map((restaurant) => (
             <Marker
               key={restaurant.id}
-              position={restaurant.coords}
+              position={[restaurant.latitude, restaurant.longitude]}
               icon={restaurantIcon(restaurant.visited)}
             >
               <Popup>
@@ -129,7 +173,7 @@ const Restaurants = () => {
                   <div className="popup-buttons mt-3">
                     <button
                       className="btn btn-primary"
-                      onClick={() => handleMenu(restaurant.menu)}
+                      onClick={() => handleMenu(restaurant.menu_items)}
                     >
                       Ver Menú
                     </button>
@@ -194,8 +238,8 @@ const Restaurants = () => {
                 }
               >
                 <option value="">Seleccionar comida</option>
-                {selectedRestaurant.menu &&
-                  Object.values(selectedRestaurant.menu).flat().map((item, idx) => (
+                {selectedRestaurant &&
+                  selectedRestaurant.menu_items.map((item, idx) => (
                     <option key={idx} value={item.name}>
                       {item.name}
                     </option>
@@ -225,7 +269,7 @@ const Restaurants = () => {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={submitReview}
+                  onClick={submitReviewHandler}
                 >
                   Enviar Reseña
                 </button>

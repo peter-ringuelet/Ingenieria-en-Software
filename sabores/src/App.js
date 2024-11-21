@@ -1,34 +1,67 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+// src/App.js
+
+import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Menu from "./components/Menu/Menu";
 import Restaurants from "./components/Restaurants/Restaurants";
 import Reviews from "./components/Reviews/Reviews";
 import Profile from "./components/Profile/Profile";
-import Home from "./components/Home/Home"; // Nueva vista inicial
+import Home from "./components/Home/Home";
+import Login from "./components/Login/Login";
+import { isAuthenticated } from "./services/auth";
 
 const App = () => {
+  const [authenticated, setAuthenticated] = useState(isAuthenticated());
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setAuthenticated(isAuthenticated());
+    };
+
+    window.addEventListener("authChange", handleAuthChange);
+    return () => window.removeEventListener("authChange", handleAuthChange);
+  }, []);
+
   return (
     <Router>
       <div style={styles.appContainer}>
-        {/* Menú siempre visible excepto en la vista de inicio */}
         <Routes>
+          {/* Ruta para la página de inicio */}
+          <Route path="/" element={<Home />} />
+
+          {/* Ruta para el formulario de inicio de sesión */}
           <Route
-            path="/"
-            element={<Home />} // Vista inicial no tiene el menú
+            path="/login"
+            element={
+              authenticated ? <Navigate to="/restaurants" /> : <Login />
+            }
           />
+
+          {/* Rutas protegidas */}
           <Route
             path="*"
             element={
-              <>
-                <Menu />
-                <div style={styles.viewContainer}>
-                  <Routes>
-                    <Route path="/restaurants" element={<Restaurants />} />
-                    <Route path="/reviews" element={<Reviews />} />
-                    <Route path="/profile" element={<Profile />} />
-                  </Routes>
-                </div>
-              </>
+              authenticated ? (
+                <>
+                  <Menu />
+                  <div style={styles.viewContainer}>
+                    <Routes>
+                      <Route path="/restaurants" element={<Restaurants />} />
+                      <Route path="/reviews" element={<Reviews />} />
+                      <Route path="/profile" element={<Profile />} />
+                      {/* Redirigir rutas desconocidas a /restaurants */}
+                      <Route path="*" element={<Navigate to="/restaurants" />} />
+                    </Routes>
+                  </div>
+                </>
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
         </Routes>
@@ -42,7 +75,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     height: "100vh",
-    backgroundColor: "var(--background-dark)", // Fondo oscuro
+    backgroundColor: "var(--background-dark)",
   },
   viewContainer: {
     flex: 1,

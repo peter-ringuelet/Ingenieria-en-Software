@@ -1,10 +1,14 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { isAuthenticated } from "../../services/auth";
 import "./Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
 
+  if (isAuthenticated()) {
+    return <Navigate to="/restaurants" />;
+  }
   return (
     <div className="home-wrapper">
       {/* Sección izquierda */}
@@ -18,10 +22,13 @@ const Home = () => {
       {/* Sección derecha */}
       <div className="home-right">
         <div className="home-buttons">
-          <button className="btn-primary" onClick={() => navigate("/restaurants")}>
+          <button className="btn-primary" onClick={() => navigate("/login")}>
             Iniciar Sesión
           </button>
-          <button className="btn-secondary" onClick={() => alert("Registrarse no implementado aún")}>
+          <button
+            className="btn-secondary"
+            onClick={() => navigate("/register")}
+          >
             Registrarse
           </button>
         </div>

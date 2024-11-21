@@ -7,7 +7,7 @@ import "../../styles/theme.css";
 import "./Restaurants.css";
 
 const Restaurants = () => {
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState({ lat: -34.854, lng: -58.043 });
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
@@ -35,11 +35,15 @@ const Restaurants = () => {
         },
         (error) => {
           console.error("Error obteniendo la ubicación:", error);
+          // Usar coordenadas de City Bell por defecto
+          setLocation({ lat: -34.854, lng: -58.043 });
           setLoading(false);
         }
       );
     } else {
       console.error("Geolocalización no soportada.");
+      // Usar coordenadas de City Bell por defecto
+      setLocation({ lat: -34.854, lng: -58.043 });
       setLoading(false);
     }
   }, []);
@@ -85,7 +89,7 @@ const Restaurants = () => {
         <p className="text-secondary">Cargando ubicación...</p>
       ) : (
         <MapContainer
-          center={[location?.lat || 0, location?.lng || 0]} // Asegúrate de que el mapa tenga un centro válido
+          center={[location.lat, location.lng]}
           zoom={15}
           className="map-container"
         >
@@ -93,11 +97,9 @@ const Restaurants = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"
           />
-          {location && (
-            <Marker position={[location.lat, location.lng]} icon={locationIcon}>
-              <Popup>Tu ubicación actual</Popup>
-            </Marker>
-          )}
+          <Marker position={[location.lat, location.lng]} icon={locationIcon}>
+            <Popup>Tu ubicación actual</Popup>
+          </Marker>
           {restaurantsData.map((restaurant) => (
             <Marker
               key={restaurant.id}

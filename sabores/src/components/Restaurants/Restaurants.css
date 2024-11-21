@@ -4,6 +4,28 @@
   --modal-radius: 10px;
   --btn-padding: 10px 20px;
   --btn-font-size: 1rem;
+  --btn-menu-bg: #dcdcdc;
+  /* Fondo para el botón "Ver Menú" */
+  --btn-menu-hover-bg: #c8c8c8;
+  /* Hover para el botón "Ver Menú" */
+  --btn-review-bg: var(--accent-color);
+  /* Fondo para "Hacer Reseña" */
+  --btn-review-hover-bg: var(--accent-hover);
+  /* Hover para "Hacer Reseña" */
+  --popup-z-index: 9999;
+  /* Nivel de z-index alto para popups */
+}
+
+/* Tema oscuro */
+body.dark-mode {
+  --btn-menu-bg: #444444;
+  /* Fondo más oscuro para "Ver Menú" */
+  --btn-menu-hover-bg: #555555;
+  /* Hover en modo oscuro para "Ver Menú" */
+  --btn-review-bg: var(--accent-color);
+  /* Naranja igual en ambos modos */
+  --btn-review-hover-bg: var(--accent-hover);
+  /* Hover igual en ambos modos */
 }
 
 /* Contenedor principal */
@@ -73,6 +95,9 @@ h1 {
   max-width: 350px;
   font-size: 1rem;
 }
+.leaflet-popup-content{
+  min-width: 250px;
+}
 
 .popup-buttons {
   display: flex;
@@ -80,10 +105,62 @@ h1 {
   gap: 15px;
 }
 
-.popup-buttons .btn {
+/* Botón "Ver Menú" */
+.popup-buttons .btn-primary {
   flex: 1;
   font-size: 0.9rem;
   padding: 10px;
+  background-color: var(--btn-menu-bg);
+  /* Fondo dinámico según modo */
+  color: var(--text-primary);
+  /* Texto oscuro o claro según modo */
+  border: none;
+  border-radius: var(--modal-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  box-shadow: none;
+  /* Sin sombra para uniformidad */
+}
+
+.popup-buttons .btn-primary:hover {
+  background-color: var(--btn-menu-hover-bg);
+  /* Hover dinámico */
+}
+
+.popup-buttons .btn-primary:focus {
+  outline: none;
+  box-shadow: none;
+  /* Sin sombra de foco */
+}
+
+/* Botón "Hacer Reseña" */
+.popup-buttons .btn-secondary {
+  flex: 1;
+  font-size: 0.9rem;
+  padding: 10px;
+  background-color: var(--btn-review-bg);
+  /* Naranja */
+  color: var(--container-bg);
+  /* Texto blanco */
+  border: none;
+  border-radius: var(--modal-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  box-shadow: none;
+  /* Sin sombra para uniformidad */
+}
+
+.popup-buttons .btn-secondary:hover {
+  background-color: var(--btn-review-hover-bg);
+  /* Hover naranja más claro */
+}
+
+.popup-buttons .btn-secondary:focus {
+  outline: none;
+  box-shadow: none;
+  /* Sin sombra de foco */
 }
 
 /* Modal */
@@ -97,9 +174,10 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--popup-z-index);
 }
 
+/* Contenido del Modal */
 .menu-modal-content {
   background-color: var(--container-bg);
   padding: var(--modal-padding);
@@ -109,6 +187,15 @@ h1 {
   box-shadow: var(--shadow);
   text-align: left;
   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Responsividad para móviles */
+@media (max-width: 768px) {
+  .menu-modal-content {
+    max-height: 80%;
+    overflow-y: auto;
+    padding: 20px;
+  }
 }
 
 .menu-modal-content.expanded {
@@ -152,7 +239,7 @@ h1 {
   font-size: var(--btn-font-size);
   font-weight: bold;
   background-color: var(--accent-color);
-  color: var(--text-primary);
+  color: #ffffff;
   border: none;
   border-radius: var(--modal-radius);
   cursor: pointer;
@@ -222,4 +309,3 @@ h1 {
   justify-content: space-between;
   margin-top: 20px;
 }
-

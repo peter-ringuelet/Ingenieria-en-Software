@@ -1,0 +1,104 @@
+/* Estructura principal para la pantalla de inicio */
+.home-wrapper {
+    display: flex;
+    height: 100vh;
+    font-family: "Arial", sans-serif;
+    background: var(--background-dark);
+}
+
+/* Sección izquierda específica para la página de inicio */
+.home-left {
+    flex: 1;
+    background: var(--accent-color);
+    color: var(--container-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+}
+
+/* Título principal (Sabores) específico para home-left */
+.home-left .home-title {
+    font-size: 4rem;
+    font-weight: bold;
+    text-shadow: var(--shadow);
+    margin-bottom: 10px;
+    color: var(--container-bg);
+    /* Cambiado a blanco */
+}
+
+/* Subtítulo específico para home-left */
+.home-left .home-subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+/* Sección derecha específica para la pantalla de inicio */
+.home-right {
+    flex: 1;
+    background: var(--background-light);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* Contenedor de botones específico para la pantalla de inicio */
+.home-right .home-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Estilos de botones generales */
+.home-right button {
+    font-size: 1.2rem;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 200px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+/* Botón primario específico para la pantalla de inicio */
+.home-right .btn-primary {
+    background-color: var(--accent-color);
+    color: var(--container-bg);
+    /* Texto blanco */
+}
+
+.home-right .btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+/* Botón secundario específico para la pantalla de inicio */
+.home-right .btn-secondary {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.home-right .btn-secondary:hover {
+    background-color: var(--container-bg);
+    color: var(--text-primary);
+    /* Ajuste para contraste */
+}
+
+/* Responsividad específica para la pantalla de inicio */
+@media screen and (max-width: 768px) {
+    .home-wrapper {
+        flex-direction: column;
+    }
+
+    .home-left,
+    .home-right {
+        height: 50vh;
+    }
+}

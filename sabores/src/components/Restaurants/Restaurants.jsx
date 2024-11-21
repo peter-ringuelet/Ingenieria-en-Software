@@ -1,27 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
 import { restaurantsData } from "../../data/restaurants";
 import { renderStars } from "../Shared/renderStars";
+import { restaurantIcon, locationIcon } from "../../utils/mapIcons";
 import "../../styles/theme.css";
 import "./Restaurants.css";
-
-const restaurantIcon = (visited) =>
-  new L.Icon({
-    iconUrl: visited
-      ? "https://cdn-icons-png.flaticon.com/512/1046/1046747.png"
-      : "/icons/food.png",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
-  });
-
-const locationIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
 
 const Restaurants = () => {
   const [location, setLocation] = useState(null);
@@ -32,12 +15,12 @@ const Restaurants = () => {
   const [reviewForm, setReviewForm] = useState({
     lugar: "",
     comida: "",
-    abundancia: "",
-    sabor: "",
-    calidadPrecio: "",
-    limpieza: "",
-    atencion: "",
-    ambiente: "",
+    abundancia: 0,
+    sabor: 0,
+    calidadPrecio: 0,
+    limpieza: 0,
+    atencion: 0,
+    ambiente: 0,
   });
 
   useEffect(() => {
@@ -62,7 +45,9 @@ const Restaurants = () => {
   }, []);
 
   const handleMenu = (menu) => {
-    setSelectedMenu(menu);
+    if (menu) {
+      setSelectedMenu(menu);
+    }
   };
 
   const closeMenu = () => {
@@ -84,9 +69,8 @@ const Restaurants = () => {
     setSelectedRestaurant(null);
   };
 
-  const handleReviewChange = (e) => {
-    const { name, value } = e.target;
-    setReviewForm((prev) => ({ ...prev, [name]: value }));
+  const handleStarClick = (field, value) => {
+    setReviewForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const submitReview = () => {
@@ -101,7 +85,7 @@ const Restaurants = () => {
         <p className="text-secondary">Cargando ubicación...</p>
       ) : (
         <MapContainer
-          center={[location.lat, location.lng]}
+          center={[location?.lat || 0, location?.lng || 0]} // Asegúrate de que el mapa tenga un centro válido
           zoom={15}
           className="map-container"
         >
@@ -110,7 +94,7 @@ const Restaurants = () => {
             attribution="&copy; OpenStreetMap contributors"
           />
           {location && (
-            <Marker position={location} icon={locationIcon}>
+            <Marker position={[location.lat, location.lng]} icon={locationIcon}>
               <Popup>Tu ubicación actual</Popup>
             </Marker>
           )}
@@ -121,31 +105,39 @@ const Restaurants = () => {
               icon={restaurantIcon(restaurant.visited)}
             >
               <Popup>
-                <h5 className="text-accent">{restaurant.name}</h5>
-                {restaurant.visited ? (
-                  <div>
-                    {renderStars(restaurant.rating)}{" "}
-                    <span className="text-success">(Visitado)</span>
+                <div className="popup-content">
+                  <h5 className="text-accent">{restaurant.name}</h5>
+                  {restaurant.visited ? (
+                    <div>
+                      {renderStars(restaurant.rating)}{" "}
+                      <span className="text-success">(Visitado)</span>
+                    </div>
+                  ) : (
+                    <p className="text-danger">(No visitado)</p>
+                  )}
+                  <p>
+                    <strong>Especialidad:</strong> {restaurant.specialty}
+                  </p>
+                  <p>
+                    <strong>Horario:</strong> {restaurant.hours}
+                  </p>
+                  <p>
+                    <strong>Teléfono:</strong> {restaurant.phone}
+                  </p>
+                  <div className="popup-buttons mt-3">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleMenu(restaurant.menu)}
+                    >
+                      Ver Menú
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => openReviewModal(restaurant)}
+                    >
+                      Hacer Reseña
+                    </button>
                   </div>
-                ) : (
-                  <p className="text-danger">(No visitado)</p>
-                )}
-                <p><strong>Especialidad:</strong> {restaurant.specialty}</p>
-                <p><strong>Horario:</strong> {restaurant.hours}</p>
-                <p><strong>Teléfono:</strong> {restaurant.phone}</p>
-                <div className="d-flex justify-content-around mt-3">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => handleMenu(restaurant.menu)}
-                  >
-                    Ver Menú
-                  </button>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => openReviewModal(restaurant)}
-                  >
-                    Hacer Reseña
-                  </button>
                 </div>
               </Popup>
             </Marker>
@@ -153,18 +145,20 @@ const Restaurants = () => {
         </MapContainer>
       )}
 
-      {/* Modal para mostrar el menú */}
+      {/* Modal del Menú */}
       {selectedMenu && (
         <div className="menu-modal">
           <div className="menu-modal-content">
             <h2 className="text-accent">Menú</h2>
+            <div className="menu-divider"></div>
             {Object.entries(selectedMenu).map(([category, items]) => (
               <div key={category}>
                 <h3>{category}</h3>
                 <ul>
                   {items.map((item, index) => (
                     <li key={index}>
-                      {item.name} - {item.price}
+                      <span>{item.name}</span>
+                      <span>{item.price}</span>
                     </li>
                   ))}
                 </ul>
@@ -180,16 +174,22 @@ const Restaurants = () => {
       {/* Modal para hacer la reseña */}
       {reviewModal && (
         <div className="menu-modal">
-          <div className="menu-modal-content">
+          <div className="menu-modal-content compact">
             <h2 className="text-accent">Hacer Reseña</h2>
             <div className="menu-divider"></div>
-            <form>
-              <p><strong>Restaurante:</strong> {reviewForm.lugar}</p>
-              <label>Comida</label>
+            <form className="review-form">
+              <p>
+                <strong>Restaurante:</strong> {reviewForm.lugar}
+              </p>
+              <label>
+                <strong>Comida:</strong>
+              </label>
               <select
                 name="comida"
                 value={reviewForm.comida}
-                onChange={handleReviewChange}
+                onChange={(e) =>
+                  setReviewForm({ ...reviewForm, comida: e.target.value })
+                }
               >
                 <option value="">Seleccionar comida</option>
                 {selectedRestaurant.menu &&
@@ -201,33 +201,40 @@ const Restaurants = () => {
               </select>
               {["abundancia", "sabor", "calidadPrecio", "limpieza", "atencion", "ambiente"].map(
                 (field) => (
-                  <div key={field}>
+                  <div key={field} className="star-rating-container">
                     <label>{field}</label>
-                    <input
-                      type="number"
-                      name={field}
-                      min="1"
-                      max="5"
-                      value={reviewForm[field]}
-                      onChange={handleReviewChange}
-                    />
+                    <div className="star-rating">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span
+                          key={star}
+                          className={`star ${
+                            reviewForm[field] >= star ? "selected" : "unselected"
+                          }`}
+                          onClick={() => handleStarClick(field, star)}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )
               )}
-              <button
-                type="button"
-                className="btn btn-primary mt-3"
-                onClick={submitReview}
-              >
-                Enviar Reseña
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary mt-3"
-                onClick={closeReviewModal}
-              >
-                Cancelar
-              </button>
+              <div className="buttons-container">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={submitReview}
+                >
+                  Enviar Reseña
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={closeReviewModal}
+                >
+                  Cancelar
+                </button>
+              </div>
             </form>
           </div>
         </div>

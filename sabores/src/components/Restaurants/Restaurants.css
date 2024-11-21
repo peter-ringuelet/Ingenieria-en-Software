@@ -1,23 +1,51 @@
+/* Variables comunes */
+:root {
+  --modal-padding: 30px;
+  --modal-radius: 10px;
+  --btn-padding: 10px 20px;
+  --btn-font-size: 1rem;
+}
+
 /* Contenedor principal */
 .restaurants-container {
   background-color: var(--container-bg);
-  /* Fondo consistente */
   padding: 20px;
   border-radius: 8px;
   box-shadow: var(--shadow);
   color: var(--text-primary);
 }
 
-/* Título principal */
-h1 {
-  font-size: 2.5rem;
+/* Títulos */
+h1,
+.menu-modal-content h2,
+.menu-modal-content h3 {
   font-weight: bold;
   color: var(--accent-color);
   text-align: center;
+}
+
+h1 {
+  font-size: 2.5rem;
   margin-bottom: 20px;
 }
 
-/* Mapa */
+.menu-modal-content h2 {
+  font-size: 2rem;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.menu-modal-content h3 {
+  font-size: 1.5rem;
+  text-transform: capitalize;
+  padding-bottom: 5px;
+  margin-top: 20px;
+  text-align: right;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--text-secondary);
+}
+
+/* Mapas */
 .map-container {
   height: 500px;
   width: 100%;
@@ -25,41 +53,40 @@ h1 {
   overflow: hidden;
   background-color: var(--container-bg);
   margin-bottom: 20px;
-  /* Espaciado del mapa */
 }
 
-/* Texto de carga */
+/* Texto */
+.text-secondary,
+.menu-modal-content li {
+  color: var(--text-secondary);
+}
+
 .text-secondary {
   font-size: 1.2rem;
-  color: var(--text-secondary);
   text-align: center;
   margin-top: 20px;
 }
 
-/* Marcadores */
-.marker-popup h5 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--accent-color);
+/* Popup */
+.popup-content {
+  padding: 0px;
+  max-width: 350px;
+  font-size: 1rem;
 }
 
-.marker-popup p {
-  color: var(--text-secondary);
-}
-
-/* Botones en el popup */
 .popup-buttons {
   display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
+  justify-content: space-between;
+  gap: 15px;
 }
 
 .popup-buttons .btn {
+  flex: 1;
   font-size: 0.9rem;
-  padding: 8px 12px;
+  padding: 10px;
 }
 
-/* Modal del menú */
+/* Modal */
 .menu-modal {
   position: fixed;
   top: 0;
@@ -75,24 +102,18 @@ h1 {
 
 .menu-modal-content {
   background-color: var(--container-bg);
-  padding: 30px;
-  border-radius: 10px;
+  padding: var(--modal-padding);
+  border-radius: var(--modal-radius);
   max-width: 700px;
   width: 90%;
   box-shadow: var(--shadow);
   text-align: left;
-  position: relative;
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Título del menú */
-.menu-modal-content h2 {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--accent-color);
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 10px;
+.menu-modal-content.expanded {
+  max-width: 900px;
+  /* Modal más grande */
 }
 
 /* Línea divisoria */
@@ -103,19 +124,7 @@ h1 {
   margin: 15px 0;
 }
 
-/* Categorías */
-.menu-modal-content h3 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--text-primary);
-  text-transform: capitalize;
-  padding-bottom: 5px;
-  text-align: right;
-  border-bottom: 1px solid var(--text-secondary);
-  margin-top: 20px;
-}
-
-/* Lista de comidas */
+/* Lista */
 .menu-modal-content ul {
   list-style: none;
   padding: 0;
@@ -124,15 +133,13 @@ h1 {
 
 .menu-modal-content li {
   font-size: 1.1rem;
-  color: var(--text-secondary);
-  margin: 8px 0;
+  margin: 10px 0;
   display: flex;
   justify-content: space-between;
   border-bottom: 1px dashed var(--text-secondary);
   padding-bottom: 5px;
 }
 
-/* Precio */
 .menu-modal-content li span:last-child {
   font-weight: bold;
   color: var(--accent-color);
@@ -141,13 +148,13 @@ h1 {
 /* Botones */
 .menu-modal-content button {
   margin-top: 30px;
-  padding: 10px 20px;
-  font-size: 1rem;
+  padding: var(--btn-padding);
+  font-size: var(--btn-font-size);
   font-weight: bold;
   background-color: var(--accent-color);
   color: var(--text-primary);
   border: none;
-  border-radius: 5px;
+  border-radius: var(--modal-radius);
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -168,3 +175,51 @@ h1 {
     transform: translateY(0);
   }
 }
+
+/* Estrellas */
+.star-rating {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.star.selected {
+  color: var(--accent-color);
+}
+
+.star.unselected {
+  color: var(--text-secondary);
+}
+
+.star-rating-container label {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  font-weight: bold;
+  margin-bottom: 0px;
+  display: block;
+}
+
+/* Review form */
+.review-form select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid var(--text-secondary);
+  border-radius: var(--modal-radius);
+  background-color: var(--container-bg);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.review-form .buttons-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+

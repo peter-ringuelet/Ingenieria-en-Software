@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 // URL base de la API
-const API_URL = 'http://192.168.0.187:8000/api'; // Sin barra final
+const API_URL = 'http://127.0.0.1:8000/api'; // Sin barra final
 
 
 

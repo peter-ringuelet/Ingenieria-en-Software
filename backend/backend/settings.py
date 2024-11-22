@@ -63,6 +63,7 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # URL de tu frontend en React
+    'http://192.168.0.187:3000',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True

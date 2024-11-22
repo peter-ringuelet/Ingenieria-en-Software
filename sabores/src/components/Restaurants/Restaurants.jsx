@@ -53,12 +53,6 @@ const Restaurants = () => {
           });
           setLoading(false);
         },
-        (error) => {
-          console.error("Error obteniendo la ubicación:", error);
-          // Usar coordenadas por defecto
-          setLocation({ lat: -34.854, lng: -58.043 });
-          setLoading(false);
-        }
       );
     } else {
       console.error("Geolocalización no soportada.");

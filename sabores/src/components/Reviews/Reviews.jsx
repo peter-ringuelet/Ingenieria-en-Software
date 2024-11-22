@@ -1,3 +1,5 @@
+// src/components/Reviews/Reviews.jsx
+
 import React, { useEffect, useState } from "react";
 import { getReviews } from "../../services/api";
 import { renderStars } from "../Shared/renderStars";
@@ -38,23 +40,35 @@ const Reviews = () => {
         <div key={review.id} className="card shadow review-card mb-4">
           <div className="card-body">
             <h5 className="card-title">{review.restaurant.name}</h5>
-            <h6 className="card-subtitle">{review.comida}</h6>
+            <h6 className="card-subtitle mb-2 text-muted">{review.comida}</h6>
             <hr />
-            <div className="row">
-              <div className="col-md-6">
-                <h6 className="text-secondary">Comida</h6>
-                <p>Abundancia: {renderStars(review.abundancia)}</p>
-                <p>Sabor: {renderStars(review.sabor)}</p>
-                <p>Relación calidad-precio: {renderStars(review.calidadPrecio)}</p>
+            <div className="row review-sections">
+              <div className="col-md-6 review-section">
+                <h6 className="section-title">Comida</h6>
+                <p className="review-stars">
+                  <strong>Abundancia:</strong> {renderStars(review.abundancia)}
+                </p>
+                <p className="review-stars">
+                  <strong>Sabor:</strong> {renderStars(review.sabor)}
+                </p>
+                <p className="review-stars">
+                  <strong>Relación calidad-precio:</strong> {renderStars(review.calidadPrecio)}
+                </p>
               </div>
-              <div className="col-md-6">
-                <h6 className="text-secondary">Servicios</h6>
-                <p>Limpieza: {renderStars(review.limpieza)}</p>
-                <p>Atención: {renderStars(review.atencion)}</p>
-                <p>Ambiente: {renderStars(review.ambiente)}</p>
+              <div className="col-md-6 review-section">
+                <h6 className="section-title">Servicios</h6>
+                <p className="review-stars">
+                  <strong>Limpieza:</strong> {renderStars(review.limpieza)}
+                </p>
+                <p className="review-stars">
+                  <strong>Atención:</strong> {renderStars(review.atencion)}
+                </p>
+                <p className="review-stars">
+                  <strong>Ambiente:</strong> {renderStars(review.ambiente)}
+                </p>
               </div>
             </div>
-            <p className="mt-3 text-muted">
+            <p className="mt-3 text-muted text-right">
                - {new Date(review.created_at).toLocaleDateString()} -
             </p>
           </div>

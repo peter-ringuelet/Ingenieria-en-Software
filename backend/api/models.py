@@ -7,8 +7,8 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.URLField(max_length=200, blank=True)
-    phone = models.CharField(max_length=20, blank=True)
+    avatar = models.URLField(max_length=200, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
     # preferences = models.JSONField(default=dict, blank=True)  # Eliminado
 
     def __str__(self):

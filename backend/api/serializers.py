@@ -99,13 +99,16 @@ class RestaurantSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    restaurant_name = serializers.ReadOnlyField(source='restaurant.name')  # Extrae el nombre del restaurante
 
     class Meta:
         model = Review
         fields = [
-            'id', 'restaurant', 'user', 'comida', 'abundancia', 'sabor',
-            'calidadPrecio', 'limpieza', 'atencion', 'ambiente', 'created_at'
+            'id', 'restaurant', 'restaurant_name', 'user', 'comida', 
+            'abundancia', 'sabor', 'calidadPrecio', 'limpieza', 
+            'atencion', 'ambiente', 'created_at'
         ]
+
 
 from django.contrib.auth.models import User
 from rest_framework import serializers

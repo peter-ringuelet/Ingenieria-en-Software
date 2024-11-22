@@ -39,8 +39,8 @@ const Reviews = () => {
       {reviewsData.map((review) => (
         <div key={review.id} className="card shadow review-card mb-4">
           <div className="card-body">
-            <h5 className="card-title">{review.restaurant.name}</h5>
-            <h6 className="card-subtitle mb-2 text-muted">{review.comida}</h6>
+            <h5 className="card-title">{review.restaurant_name}</h5>
+            <h6 className="card-subtitle mb-2 ">{review.comida}</h6>
             <hr />
             <div className="row review-sections">
               <div className="col-md-6 review-section">

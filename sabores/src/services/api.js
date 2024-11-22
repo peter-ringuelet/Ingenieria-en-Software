@@ -3,7 +3,9 @@
 import axios from 'axios';
 
 // URL base de la API
-const API_URL = 'http://localhost:8000/api'; // Sin barra final
+const API_URL = 'http://192.168.0.187:8000/api'; // Sin barra final
+
+
 
 // Crear una instancia de axios con el Content-Type por defecto
 const api = axios.create({

@@ -22,13 +22,14 @@ const Restaurants = () => {
   };
 
   // Estados para manejar la ubicación, carga, datos de restaurantes, menú seleccionado, restaurante seleccionado, modal de reseña y formulario de reseña
-  const [location, setLocation] = useState({ lat: -34.854, lng: -58.043 });
+  const [location, setLocation] = useState(null); // Inicializar como null
   const [loading, setLoading] = useState(true);
   const [restaurantsData, setRestaurantsData] = useState([]); // Estado para los restaurantes
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [reviewModal, setReviewModal] = useState(false);
   const [reviewForm, setReviewForm] = useState(initialReviewForm);
+  const [locationError, setLocationError] = useState(null); // Nuevo estado para manejar errores de ubicación
 
   // Función para cargar los restaurantes desde el backend
   const loadRestaurants = () => {
@@ -56,11 +57,15 @@ const Restaurants = () => {
           });
           setLoading(false);
         },
+        (error) => {
+          console.error("Error al obtener la ubicación del usuario:", error);
+          setLocationError("No se pudo obtener tu ubicación. Por favor, permite el acceso a la geolocalización.");
+          setLoading(false);
+        }
       );
     } else {
       console.error("Geolocalización no soportada.");
-      // Usar coordenadas por defecto
-      setLocation({ lat: -34.854, lng: -58.043 });
+      setLocationError("La geolocalización no es soportada por tu navegador.");
       setLoading(false);
     }
   }, []);
@@ -161,7 +166,7 @@ const Restaurants = () => {
       <h1 className="mb-4 text-accent">Explora los Sabores de tu Ciudad</h1>
       {loading ? (
         <p className="text-secondary">Cargando ubicación y restaurantes...</p>
-      ) : (
+      ) : location ? (
         <MapContainer
           center={[location.lat, location.lng]}
           zoom={15}
@@ -221,6 +226,8 @@ const Restaurants = () => {
             </Marker>
           ))}
         </MapContainer>
+      ) : (
+        <p className="text-danger">{locationError || "No se pudo obtener tu ubicación."}</p>
       )}
 
       {/* Modal del Menú */}

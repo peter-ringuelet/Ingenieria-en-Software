@@ -1,10 +1,11 @@
 # api/views.py
 
 from rest_framework import generics, permissions, viewsets
-from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db.models import Avg
 from .models import Profile, Restaurant, Review
 from .serializers import UserSerializer, ProfileSerializer, RestaurantSerializer, ReviewSerializer
 
@@ -29,9 +30,9 @@ class RegisterView(generics.CreateAPIView):
             return Response({'error': 'Faltan campos requeridos.'}, status=400)
 
 class ProfileView(generics.RetrieveUpdateAPIView):
-    serializer_class = ProfileSerializer  # Cambiado a ProfileSerializer
+    serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser]  # Aceptamos solo JSON
+    parser_classes = [JSONParser]
 
     def get_object(self):
         return self.request.user.profile
@@ -39,8 +40,6 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 class RestaurantViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
-
-from django.db.models import Avg
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all().order_by('-created_at')  # Orden descendente por fecha
@@ -78,9 +77,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
             averages['avg_atencion'] +
             averages['avg_ambiente']
         )
-        count = 6  # Número de atributos de calificación
+        count = 7  # Número de atributos de calificación
 
         if total and count:
             average_rating = total / count
-            restaurant.rating = round(average_rating, 2)  # Redondear a 2 decimales
+            # Redondear al 0.5 más cercano
+            rounded_rating = round(average_rating * 2) / 2
+            restaurant.rating = rounded_rating
             restaurant.save()

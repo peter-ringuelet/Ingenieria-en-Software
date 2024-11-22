@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 // URL base de la API
-const API_URL = 'http://localhost:8000/api'; // Asegúrate de que esta URL apunte a tu backend
+const API_URL = 'http://localhost:8000/api'; // Sin barra final
 
 // Crear una instancia de axios con el Content-Type por defecto
 const api = axios.create({
@@ -174,7 +174,7 @@ export const updateProfile = async (profileData) => {
     const response = await api.put('/profile/', profileData);
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : error;
+    throw error;
   }
 };
 

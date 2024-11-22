@@ -38,6 +38,15 @@ class RestaurantViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
 
+    def get_serializer_context(self):
+        """
+        Agrega el objeto de la solicitud al contexto del serializador.
+        """
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.none()  # Define un queryset vacío
     serializer_class = ReviewSerializer

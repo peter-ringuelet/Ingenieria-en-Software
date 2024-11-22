@@ -3,6 +3,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Profile, Restaurant, MenuItem, Review
+from django.db.models import Avg
 
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=False, allow_blank=True)
@@ -47,8 +48,12 @@ class MenuItemSerializer(serializers.ModelSerializer):
         model = MenuItem
         fields = ['id', 'category', 'name', 'price']
 
+from rest_framework.fields import SerializerMethodField
+
 class RestaurantSerializer(serializers.ModelSerializer):
     menu_items = MenuItemSerializer(many=True, read_only=True)
+    visited = SerializerMethodField()
+    rating = SerializerMethodField()
 
     class Meta:
         model = Restaurant
@@ -56,7 +61,41 @@ class RestaurantSerializer(serializers.ModelSerializer):
             'id', 'name', 'latitude', 'longitude', 'specialty', 'hours',
             'phone', 'visited', 'rating', 'menu_items'
         ]
-        read_only_fields = ['rating', 'visited']  # Opcional: Hacer estos campos de solo lectura
+
+    def get_visited(self, obj):
+        """
+        Devuelve True si el usuario autenticado tiene al menos una reseña
+        para este restaurante; de lo contrario, False.
+        """
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return obj.reviews.filter(user=user).exists()
+        return False
+
+    def get_rating(self, obj):
+        """
+        Calcula el promedio de estrellas basado únicamente en las reseñas
+        del usuario autenticado para este restaurante.
+        """
+        user = self.context['request'].user
+        if user.is_authenticated:
+            averages = obj.reviews.filter(user=user).aggregate(
+                avg_comida=Avg('comida'),
+                avg_abundancia=Avg('abundancia'),
+                avg_sabor=Avg('sabor'),
+                avg_calidadPrecio=Avg('calidadPrecio'),
+                avg_limpieza=Avg('limpieza'),
+                avg_atencion=Avg('atencion'),
+                avg_ambiente=Avg('ambiente')
+            )
+
+            total = sum(filter(None, averages.values()))  # Ignorar valores None
+            count = len([v for v in averages.values() if v is not None])  # Contar solo valores no None
+
+            if total and count:
+                average_rating = total / count
+                return round(average_rating * 2) / 2  # Redondear al 0.5 más cercano
+        return 0.0
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

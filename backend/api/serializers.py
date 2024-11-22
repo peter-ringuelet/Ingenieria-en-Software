@@ -17,13 +17,15 @@ class UserSerializer(serializers.ModelSerializer):
         # Alternativamente, puedes usar 'read_only_fields'
         # read_only_fields = ['username']
 
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    avatar = serializers.ImageField(required=False, allow_null=True)  # Permite manejar imágenes
 
     class Meta:
         model = Profile
         fields = ['avatar', 'user', 'phone']
-    
+
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
         user = instance.user
@@ -34,12 +36,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         user.email = user_data.get('email', user.email)
         user.save()
 
-        # Actualizar campos del perfil
-        instance.avatar = validated_data.get('avatar', instance.avatar)
+        # Actualizar el avatar
+        if 'avatar' in validated_data:
+            if instance.avatar:
+                instance.avatar.delete()  # Eliminar avatar anterior
+            instance.avatar = validated_data['avatar']
+
+        # Actualizar otros campos del perfil
         instance.phone = validated_data.get('phone', instance.phone)
         instance.save()
 
         return instance
+
 
 # Serializadores para MenuItem, Restaurant y Review permanecen sin cambios
 

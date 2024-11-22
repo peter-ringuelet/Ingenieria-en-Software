@@ -1,15 +1,14 @@
 # api/models.py
 
-from django.contrib.auth.models import User
 from django.db import models
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.URLField(max_length=200, blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)  # Cambiado a ImageField
     phone = models.CharField(max_length=20, blank=True, null=True)
-    # preferences = models.JSONField(default=dict, blank=True)  # Eliminado
 
     def __str__(self):
         return self.user.username
@@ -18,6 +17,7 @@ class Profile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+
 
 # Otras clases de modelo (Restaurant, MenuItem, Review) permanecen sin cambios
 

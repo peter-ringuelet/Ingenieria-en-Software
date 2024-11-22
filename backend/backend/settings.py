@@ -16,6 +16,11 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import os
+
+MEDIA_URL = '/avatars/'  # URL para servir los archivos de media
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Ruta donde se guardan los archivos
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/

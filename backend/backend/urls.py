@@ -5,6 +5,8 @@ from django.urls import path, include
 from rest_framework import routers
 from api.views import RestaurantViewSet, ReviewViewSet, RegisterView, ProfileView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
 router.register(r'restaurants', RestaurantViewSet)
@@ -17,4 +19,4 @@ urlpatterns = [
     path('api/auth/login/', TokenObtainPairView.as_view(), name='auth_login'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/profile/', ProfileView.as_view(), name='user_profile'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

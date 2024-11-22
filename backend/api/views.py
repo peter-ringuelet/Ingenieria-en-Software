@@ -1,7 +1,7 @@
 # api/views.py
 
 from rest_framework import generics, permissions, viewsets
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -29,10 +29,11 @@ class RegisterView(generics.CreateAPIView):
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser]
+    parser_classes = [JSONParser, MultiPartParser]  # Agrega MultiPartParser
 
     def get_object(self):
         return self.request.user.profile
+
 
 class RestaurantViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Restaurant.objects.all()

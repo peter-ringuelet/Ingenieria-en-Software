@@ -172,7 +172,20 @@ export const getProfile = async () => {
 
 export const updateProfile = async (profileData) => {
   try {
-    const response = await api.put('/profile/', profileData);
+    const formData = new FormData();
+    formData.append('user.first_name', profileData.user.first_name);
+    formData.append('user.last_name', profileData.user.last_name);
+    formData.append('user.email', profileData.user.email);
+    formData.append('phone', profileData.phone);
+    if (profileData.avatar) {
+      formData.append('avatar', profileData.avatar); // Agrega la imagen
+    }
+
+    const response = await api.put('/profile/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data', // Configura para manejar archivos
+      },
+    });
     return response.data;
   } catch (error) {
     throw error;

@@ -1,9 +1,10 @@
-// src/components/Profile/Profile.jsx
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout, getProfile, updateProfile } from "../../services/api";
-import "./Profile.css"; // Importamos los estilos
+import ProfileHeader from "./ProfileHeader";
+import ProfileForm from "./ProfileForm";
+import ProfileView from "./ProfileView";
+import "./Profile.css";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -16,14 +17,9 @@ const Profile = () => {
     phone: "",
     avatar: "",
   });
-  const [isEditing, setIsEditing] = useState(false); // Estado para controlar el modo edición
-  const [loading, setLoading] = useState(true); // Estado de carga
-  const [error, setError] = useState(null); // Estado de error
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -36,7 +32,7 @@ const Profile = () => {
           email: data.user.email || "",
           phone: data.phone || "",
           avatar: data.avatar || "",
-        }); // Inicializamos formData con los datos del perfil
+        });
         setLoading(false);
       } catch (err) {
         console.error("Error al obtener el perfil:", err);
@@ -48,9 +44,7 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
+  const handleEditClick = () => setIsEditing(true);
 
   const handleCancelEdit = () => {
     setFormData({
@@ -59,25 +53,30 @@ const Profile = () => {
       email: profileData.user.email || "",
       phone: profileData.phone || "",
       avatar: profileData.avatar || "",
-    }); // Restablecemos los cambios
+    });
     setIsEditing(false);
-    setError(null); // Limpiamos cualquier error previo
+    setError(null);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  };
 
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prevFormData) => ({ ...prevFormData, avatar: file }));
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Preparar los datos para enviar al backend
-      const updateData = {
+      const updatedData = await updateProfile({
         user: {
           first_name: formData.first_name,
           last_name: formData.last_name,
@@ -85,174 +84,50 @@ const Profile = () => {
         },
         phone: formData.phone,
         avatar: formData.avatar,
-      };
-
-      const updatedData = await updateProfile(updateData);
-      setProfileData(updatedData); // Actualizamos los datos del perfil
+      });
+      setProfileData(updatedData);
       setIsEditing(false);
-      setError(null); // Limpiamos cualquier error previo
-      // Puedes agregar una notificación de éxito aquí
+      setError(null);
     } catch (err) {
       console.error("Error al actualizar el perfil:", err);
-      // Registrar todo el objeto de error para depuración
-      if (err.response) {
-        console.log("Detalles del error:", err.response.data);
-        if (err.response.data.detail) {
-          setError(err.response.data.detail);
-        } else if (err.response.data.user) {
-          if (err.response.data.user.email) {
-            setError(`Email: ${err.response.data.user.email[0]}`);
-          } else if (err.response.data.user.username) { // Por si acaso
-            setError(`Username: ${err.response.data.user.username[0]}`);
-          } else {
-            setError("Error en los campos del usuario.");
-          }
-        } else {
-          setError("No se pudo actualizar el perfil.");
-        }
-      } else {
-        setError("No se pudo actualizar el perfil.");
-      }
+      setError("No se pudo actualizar el perfil.");
     }
   };
 
-  if (loading) {
-    return <div className="profile-container">Cargando...</div>;
-  }
-
-  if (error && !isEditing) {
-    return (
-      <div className="profile-container">
-        <p className="text-danger">{error}</p>
-      </div>
-    );
-  }
-
-  if (!profileData) {
-    return null; // O muestra un mensaje de que no hay datos
-  }
+  if (loading) return <div className="profile-container">Cargando...</div>;
+  if (error && !isEditing)
+    return <div className="profile-container"><p className="text-danger">{error}</p></div>;
 
   const { avatar, first_name, last_name, email, phone } = formData;
-
-  // Definir la URL del avatar, usando la imagen predeterminada si no hay avatar
   const avatarUrl = avatar || "/images/default-avatar.png";
 
   return (
     <div className="profile-container">
-      <div className="profile-header">
-        {isEditing ? (
-          <>
-            <h1 className="profile-name">Editar Perfil</h1>
-            <p className="profile-description">
-              Modifica tu información y haz clic en "Guardar Cambios".
-            </p>
-          </>
-        ) : (
-          <>
-            <img src={avatarUrl} alt="Avatar" className="profile-avatar" />
-            <h1 className="profile-name">{`${first_name} ${last_name}`}</h1>
-            <p className="profile-description">
-              Bienvenido a tu perfil. Aquí puedes actualizar tu información personal.
-            </p>
-          </>
-        )}
-      </div>
+      <ProfileHeader
+        isEditing={isEditing}
+        avatarUrl={avatarUrl}
+        first_name={first_name}
+        last_name={last_name}
+      />
       <div className="profile-content">
         {isEditing ? (
-          <form onSubmit={handleSubmit} className="profile-form">
-            <div className="profile-card">
-              <h2>Información Personal</h2>
-              <div className="form-group">
-                <label>Nombre</label>
-                <input
-                  type="text"
-                  name="first_name"
-                  value={first_name || ""}
-                  onChange={handleChange}
-                  className="profile-input"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Apellido</label>
-                <input
-                  type="text"
-                  name="last_name"
-                  value={last_name || ""}
-                  onChange={handleChange}
-                  className="profile-input"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={email || ""}
-                  onChange={handleChange}
-                  className="profile-input"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Teléfono</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={phone || ""}
-                  onChange={handleChange}
-                  className="profile-input"
-                />
-              </div>
-              <div className="form-group">
-                <label>Avatar (URL)</label>
-                <input
-                  type="text"
-                  name="avatar"
-                  value={avatar || ""}
-                  onChange={handleChange}
-                  className="profile-input"
-                />
-              </div>
-            </div>
-            {error && <p className="text-danger">{error}</p>}
-            <div className="button-group">
-              <button type="submit" className="profile-button">
-                Guardar Cambios
-              </button>
-              <button
-                type="button"
-                className="profile-button profile-button-secondary"
-                onClick={handleCancelEdit}
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
+          <ProfileForm
+            formData={formData}
+            handleChange={handleChange}
+            handleFileChange={handleFileChange}
+            handleSubmit={handleSubmit}
+            handleCancelEdit={handleCancelEdit}
+            error={error}
+          />
         ) : (
-          <>
-            <div className="profile-card">
-              <h2>Información Personal</h2>
-              <p>Nombre: {`${first_name} ${last_name}`}</p>
-              <p>Email: {email}</p>
-              <p>Teléfono: {phone}</p>
-            </div>
-            <div className="profile-card">
-              <h2>Configuración</h2>
-              <div className="button-group">
-                <button className="profile-button" onClick={handleEditClick}>
-                  Editar Perfil
-                </button>
-                <button
-                  className="profile-button profile-button-secondary"
-                  onClick={handleLogout}
-                >
-                  Cerrar Sesión
-                </button>
-              </div>
-            </div>
-          </>
+          <ProfileView
+            first_name={first_name}
+            last_name={last_name}
+            email={email}
+            phone={phone}
+            handleEditClick={handleEditClick}
+            handleLogout={handleLogout}
+          />
         )}
       </div>
     </div>

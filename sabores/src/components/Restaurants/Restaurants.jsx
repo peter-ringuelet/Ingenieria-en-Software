@@ -5,6 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { getRestaurants, submitReview } from "../../services/api"; // Importamos las funciones necesarias
 import { renderStars } from "../Shared/renderStars";
 import { restaurantIcon, locationIcon } from "../../utils/mapIcons";
+import { getReviews } from "../../services/api"; // Asegúrate de importar esta función
+
 import "../../styles/theme.css";
 import "./Restaurants.css";
 
@@ -30,6 +32,19 @@ const Restaurants = () => {
   const [reviewModal, setReviewModal] = useState(false);
   const [reviewForm, setReviewForm] = useState(initialReviewForm);
   const [locationError, setLocationError] = useState(null); // Nuevo estado para manejar errores de ubicación
+  const [reviewsData, setReviewsData] = useState([]); // Nuevo estado para las reseñas
+
+
+  const loadReviews = () => {
+    getReviews()
+      .then((data) => {
+        setReviewsData(data); // Almacena las reseñas en el estado
+      })
+      .catch((error) => {
+        console.error("Error al obtener las reseñas:", error);
+      });
+  };
+
 
   // Función para cargar los restaurantes desde el backend
   const loadRestaurants = () => {
@@ -73,13 +88,29 @@ const Restaurants = () => {
   // useEffect para cargar los restaurantes al montar el componente
   useEffect(() => {
     loadRestaurants();
+    loadReviews(); // Carga las reseñas del usuario
   }, []);
 
   // Manejar la selección del menú de un restaurante
-  const handleMenu = (menuItems) => {
+  const handleMenu = (menuItems, restaurantId) => {
     if (menuItems && menuItems.length > 0) {
-      // Agrupar los items del menú por categoría
-      const menu = menuItems.reduce((acc, item) => {
+      const menuWithReviews = menuItems.map((item) => {
+        const userReviews = reviewsData.filter(
+          (review) => review.restaurant === restaurantId && review.comida === item.name
+        );
+
+        const averageRating =
+          userReviews.length > 0
+            ? userReviews.reduce((sum, review) => sum + review.sabor, 0) / userReviews.length
+            : 0;
+
+        return {
+          ...item,
+          averageRating: averageRating > 0 ? Math.round(averageRating * 2) / 2 : null,
+        };
+      });
+
+      const groupedMenu = menuWithReviews.reduce((acc, item) => {
         const category = item.category;
         if (!acc[category]) {
           acc[category] = [];
@@ -87,9 +118,11 @@ const Restaurants = () => {
         acc[category].push(item);
         return acc;
       }, {});
-      setSelectedMenu(menu);
+
+      setSelectedMenu(groupedMenu);
     }
   };
+
 
   // Cerrar el menú seleccionado
   const closeMenu = () => {
@@ -210,7 +243,7 @@ const Restaurants = () => {
                   <div className="popup-buttons mt-3">
                     <button
                       className="btn btn-primary"
-                      onClick={() => handleMenu(restaurant.menu_items)}
+                      onClick={() => handleMenu(restaurant.menu_items, restaurant.id)}
                     >
                       Ver Menú
                     </button>
@@ -242,13 +275,16 @@ const Restaurants = () => {
                 <ul>
                   {items.map((item, index) => (
                     <li key={index}>
-                      <span>{item.name}</span>
+                      <span>
+                        {item.name} {item.averageRating !== null && renderStars(item.averageRating, "small")}
+                      </span>
                       <span>{item.price}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
+
             <button className="btn btn-secondary" onClick={closeMenu}>
               Cerrar
             </button>

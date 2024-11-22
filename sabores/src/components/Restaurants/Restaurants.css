@@ -222,14 +222,40 @@ h1 {
   font-size: 1.1rem;
   margin: 10px 0;
   display: flex;
+  align-items: center;
+  /* Asegura la alineación vertical */
   justify-content: space-between;
   border-bottom: 1px dashed var(--text-secondary);
   padding-bottom: 5px;
+  gap: 10px;
+  /* Espaciado entre los elementos */
+}
+
+/* Clase específica para las estrellas del menú */
+.menu-star-rating {
+  font-size: 0.9rem;
+  /* Tamaño pequeño para las estrellas */
+  margin-left: 10px;
+  /* Espaciado menor respecto al nombre */
+  color: var(--accent-color);
+  /* Color consistente */
+  display: flex;
+  /* Asegura que las estrellas estén alineadas */
+  align-items: center;
+  /* Centra verticalmente las estrellas */
+}
+
+/* Estilo para el nombre y precio */
+.menu-modal-content li span:first-child {
+  flex: 1;
+  /* Deja espacio al nombre de la comida */
 }
 
 .menu-modal-content li span:last-child {
   font-weight: bold;
   color: var(--accent-color);
+  margin-right: 10px;
+  /* Espaciado para separar del resto */
 }
 
 /* Botones */
@@ -309,3 +335,4 @@ h1 {
   justify-content: space-between;
   margin-top: 20px;
 }
+

@@ -34,3 +34,17 @@
     color: #d3d3d3;
     /* Gris claro para estrellas vacías */
 }
+
+/* Tamaños personalizados */
+.star.small {
+    font-size: 16px;
+}
+
+.star.medium {
+    font-size: 24px;
+    /* Tamaño predeterminado */
+}
+
+.star.large {
+    font-size: 32px;
+}

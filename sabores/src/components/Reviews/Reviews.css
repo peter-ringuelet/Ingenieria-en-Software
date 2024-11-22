@@ -48,3 +48,10 @@
     flex-direction: column;
   }
 }
+
+/* Estilo para la fecha de la reseña */
+.review-date {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}

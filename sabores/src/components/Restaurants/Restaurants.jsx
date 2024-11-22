@@ -9,14 +9,8 @@ import "../../styles/theme.css";
 import "./Restaurants.css";
 
 const Restaurants = () => {
-  // Estados para manejar la ubicación, carga, datos de restaurantes, menú seleccionado, restaurante seleccionado, modal de reseña y formulario de reseña
-  const [location, setLocation] = useState({ lat: -34.854, lng: -58.043 });
-  const [loading, setLoading] = useState(true);
-  const [restaurantsData, setRestaurantsData] = useState([]); // Estado para los restaurantes
-  const [selectedMenu, setSelectedMenu] = useState(null);
-  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-  const [reviewModal, setReviewModal] = useState(false);
-  const [reviewForm, setReviewForm] = useState({
+  // Definir la estructura inicial del formulario
+  const initialReviewForm = {
     lugar: "",
     comida: "",
     abundancia: 0,
@@ -25,7 +19,16 @@ const Restaurants = () => {
     limpieza: 0,
     atencion: 0,
     ambiente: 0,
-  });
+  };
+
+  // Estados para manejar la ubicación, carga, datos de restaurantes, menú seleccionado, restaurante seleccionado, modal de reseña y formulario de reseña
+  const [location, setLocation] = useState({ lat: -34.854, lng: -58.043 });
+  const [loading, setLoading] = useState(true);
+  const [restaurantsData, setRestaurantsData] = useState([]); // Estado para los restaurantes
+  const [selectedMenu, setSelectedMenu] = useState(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const [reviewModal, setReviewModal] = useState(false);
+  const [reviewForm, setReviewForm] = useState(initialReviewForm);
 
   // Función para cargar los restaurantes desde el backend
   const loadRestaurants = () => {
@@ -91,11 +94,10 @@ const Restaurants = () => {
   // Abrir el modal de reseña para un restaurante seleccionado
   const openReviewModal = (restaurant) => {
     setSelectedRestaurant(restaurant);
-    setReviewForm((prev) => ({
-      ...prev,
+    setReviewForm({
+      ...initialReviewForm,
       lugar: restaurant.name,
-      comida: "",
-    }));
+    });
     setReviewModal(true);
   };
 
@@ -103,6 +105,7 @@ const Restaurants = () => {
   const closeReviewModal = () => {
     setReviewModal(false);
     setSelectedRestaurant(null);
+    setReviewForm(initialReviewForm); // Resetear el formulario
   };
 
   // Manejar el clic en las estrellas de calificación

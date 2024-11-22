@@ -1,5 +1,3 @@
-// src/App.js
-
 import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
@@ -13,6 +11,7 @@ import Reviews from "./components/Reviews/Reviews";
 import Profile from "./components/Profile/Profile";
 import Home from "./components/Home/Home";
 import Login from "./components/Login/Login";
+import Register from "./components/Register/Register"; // Importar Register
 import { isAuthenticated } from "./services/auth";
 
 const App = () => {
@@ -42,6 +41,14 @@ const App = () => {
             }
           />
 
+          {/* Ruta para el formulario de registro */}
+          <Route
+            path="/register"
+            element={
+              authenticated ? <Navigate to="/restaurants" /> : <Register />
+            }
+          />
+
           {/* Rutas protegidas */}
           <Route
             path="*"
@@ -60,7 +67,7 @@ const App = () => {
                   </div>
                 </>
               ) : (
-                <Navigate to="/login" />
+                <Navigate to="/" />
               )
             }
           />

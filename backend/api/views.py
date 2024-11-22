@@ -7,27 +7,24 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Avg
 from .models import Profile, Restaurant, Review
-from .serializers import UserSerializer, ProfileSerializer, RestaurantSerializer, ReviewSerializer
+from .serializers import UserSerializer, ProfileSerializer, RestaurantSerializer, ReviewSerializer, RegisterSerializer
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'user': UserSerializer(user).data,
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        })
 
-        if username and email and password:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'user': UserSerializer(user).data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            })
-        else:
-            return Response({'error': 'Faltan campos requeridos.'}, status=400)
 
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
@@ -42,9 +39,18 @@ class RestaurantViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RestaurantSerializer
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all().order_by('-created_at')  # Orden descendente por fecha
+    queryset = Review.objects.none()  # Define un queryset vacío
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        """
+        Devuelve solo las reseñas del usuario autenticado.
+        Si el usuario no está autenticado, devuelve un conjunto vacío.
+        """
+        if self.request.user.is_authenticated:
+            return Review.objects.filter(user=self.request.user).order_by('-created_at')
+        return Review.objects.none()
 
     def perform_create(self, serializer):
         # Guardar la reseña con el usuario actual

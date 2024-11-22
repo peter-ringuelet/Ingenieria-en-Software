@@ -79,20 +79,19 @@ api.interceptors.response.use(
 export const register = async (username, email, password) => {
   try {
     const response = await api.post('/auth/register/', {
-      username,
-      email,
-      password,
+      username: username,
+      email: email,
+      password: password,
     });
     const { access, refresh, user } = response.data;
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
-    // Establecer el encabezado de autorización en la instancia 'api'
     api.defaults.headers.common['Authorization'] = 'Bearer ' + access;
-    // Disparar evento personalizado para notificar el cambio de autenticación
     window.dispatchEvent(new Event('authChange'));
     return user;
   } catch (error) {
-    throw error.response ? error.response.data : error;
+    console.error('Error en el registro:', error.response ? error.response.data : error);
+    throw error;
   }
 };
 

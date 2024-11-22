@@ -1,0 +1,91 @@
+/* src/components/Register/Register.css */
+
+.register-container {
+    width: 90%;
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 20px;
+    background: var(--container-bg);
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.register-form .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+    position: relative;
+}
+
+.register-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.register-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background: #f2f2f2;
+    color: #333333;
+    box-sizing: border-box;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.register-input:hover {
+    background-color: #e6e6e6;
+}
+
+.register-input:focus {
+    outline: none;
+    border-color: #999999;
+    background-color: #ffffff;
+}
+
+.register-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: var(--container-bg);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.text-danger {
+    color: var(--danger-color);
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    font-size: 1rem;
+}
+
+.btn-link:hover {
+    color: var(--accent-hover);
+}

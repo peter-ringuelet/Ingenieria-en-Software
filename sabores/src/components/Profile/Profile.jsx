@@ -73,26 +73,38 @@ const Profile = () => {
     navigate("/");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const updatedData = await updateProfile({
-        user: {
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          email: formData.email,
-        },
-        phone: formData.phone,
-        avatar: formData.avatar,
-      });
-      setProfileData(updatedData);
-      setIsEditing(false);
-      setError(null);
-    } catch (err) {
-      console.error("Error al actualizar el perfil:", err);
-      setError("No se pudo actualizar el perfil.");
-    }
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    // Envía los datos del formulario al backend
+    const updatedData = await updateProfile({
+      user: {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+      },
+      phone: formData.phone,
+      avatar: formData.avatar, // Esto puede ser un archivo
+    });
+
+    // Actualiza los datos del perfil y del formulario
+    setProfileData(updatedData);
+    setFormData({
+      first_name: updatedData.user.first_name || "",
+      last_name: updatedData.user.last_name || "",
+      email: updatedData.user.email || "",
+      phone: updatedData.phone || "",
+      avatar: updatedData.avatar || "", // Asegúrate de que esta URL sea válida
+    });
+
+    setIsEditing(false);
+    setError(null);
+  } catch (err) {
+    console.error("Error al actualizar el perfil:", err);
+    setError("No se pudo actualizar el perfil.");
+  }
+};
+
 
   if (loading) return <div className="profile-container">Cargando...</div>;
   if (error && !isEditing)

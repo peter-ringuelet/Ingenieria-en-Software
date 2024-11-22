@@ -48,6 +48,8 @@ class MenuItemSerializer(serializers.ModelSerializer):
         model = MenuItem
         fields = ['id', 'category', 'name', 'price']
 
+# api/serializers.py
+
 class RestaurantSerializer(serializers.ModelSerializer):
     menu_items = MenuItemSerializer(many=True, read_only=True)
 
@@ -57,6 +59,8 @@ class RestaurantSerializer(serializers.ModelSerializer):
             'id', 'name', 'latitude', 'longitude', 'specialty', 'hours',
             'phone', 'visited', 'rating', 'menu_items'
         ]
+        read_only_fields = ['rating', 'visited']  # Opcional: Hacer estos campos de solo lectura
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

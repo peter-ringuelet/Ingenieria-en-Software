@@ -40,10 +40,47 @@ class RestaurantViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
 
+from django.db.models import Avg
+
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all().order_by('-created_at')  # Orden descendente por fecha
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        # Guardar la reseña con el usuario actual
+        review = serializer.save(user=self.request.user)
+        restaurant = review.restaurant
+
+        # Si el restaurante no ha sido visitado, actualizarlo
+        if not restaurant.visited:
+            restaurant.visited = True
+            restaurant.save()
+
+        # Calcular el promedio de todas las estrellas de todas las reseñas del restaurante
+        averages = restaurant.reviews.aggregate(
+            avg_comida=Avg('comida'),
+            avg_abundancia=Avg('abundancia'),
+            avg_sabor=Avg('sabor'),
+            avg_calidadPrecio=Avg('calidadPrecio'),
+            avg_limpieza=Avg('limpieza'),
+            avg_atencion=Avg('atencion'),
+            avg_ambiente=Avg('ambiente')
+        )
+
+        # Calcular el promedio general
+        total = (
+            averages['avg_comida'] +
+            averages['avg_abundancia'] +
+            averages['avg_sabor'] +
+            averages['avg_calidadPrecio'] +
+            averages['avg_limpieza'] +
+            averages['avg_atencion'] +
+            averages['avg_ambiente']
+        )
+        count = 6  # Número de atributos de calificación
+
+        if total and count:
+            average_rating = total / count
+            restaurant.rating = round(average_rating, 2)  # Redondear a 2 decimales
+            restaurant.save()

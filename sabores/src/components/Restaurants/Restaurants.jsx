@@ -1,3 +1,5 @@
+// src/components/Restaurants/Restaurants.jsx
+
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { getRestaurants, submitReview } from "../../services/api"; // Importamos las funciones necesarias
@@ -7,6 +9,7 @@ import "../../styles/theme.css";
 import "./Restaurants.css";
 
 const Restaurants = () => {
+  // Estados para manejar la ubicación, carga, datos de restaurantes, menú seleccionado, restaurante seleccionado, modal de reseña y formulario de reseña
   const [location, setLocation] = useState({ lat: -34.854, lng: -58.043 });
   const [loading, setLoading] = useState(true);
   const [restaurantsData, setRestaurantsData] = useState([]); // Estado para los restaurantes
@@ -24,6 +27,21 @@ const Restaurants = () => {
     ambiente: 0,
   });
 
+  // Función para cargar los restaurantes desde el backend
+  const loadRestaurants = () => {
+    setLoading(true);
+    getRestaurants()
+      .then((data) => {
+        setRestaurantsData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los restaurantes:", error);
+        setLoading(false);
+      });
+  };
+
+  // useEffect para obtener la ubicación del usuario al montar el componente
   useEffect(() => {
     // Obtener la ubicación del usuario
     if (navigator.geolocation) {
@@ -50,17 +68,12 @@ const Restaurants = () => {
     }
   }, []);
 
+  // useEffect para cargar los restaurantes al montar el componente
   useEffect(() => {
-    // Obtener los restaurantes desde el backend
-    getRestaurants()
-      .then((data) => {
-        setRestaurantsData(data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener los restaurantes:", error);
-      });
+    loadRestaurants();
   }, []);
 
+  // Manejar la selección del menú de un restaurante
   const handleMenu = (menuItems) => {
     if (menuItems && menuItems.length > 0) {
       // Agrupar los items del menú por categoría
@@ -76,10 +89,12 @@ const Restaurants = () => {
     }
   };
 
+  // Cerrar el menú seleccionado
   const closeMenu = () => {
     setSelectedMenu(null);
   };
 
+  // Abrir el modal de reseña para un restaurante seleccionado
   const openReviewModal = (restaurant) => {
     setSelectedRestaurant(restaurant);
     setReviewForm((prev) => ({
@@ -90,17 +105,34 @@ const Restaurants = () => {
     setReviewModal(true);
   };
 
+  // Cerrar el modal de reseña
   const closeReviewModal = () => {
     setReviewModal(false);
     setSelectedRestaurant(null);
   };
 
+  // Manejar el clic en las estrellas de calificación
   const handleStarClick = (field, value) => {
     setReviewForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Manejar el envío de la reseña
   const submitReviewHandler = () => {
     if (!selectedRestaurant) {
+      return;
+    }
+
+    // Validar que se hayan completado todos los campos requeridos
+    if (
+      !reviewForm.comida ||
+      reviewForm.abundancia === 0 ||
+      reviewForm.sabor === 0 ||
+      reviewForm.calidadPrecio === 0 ||
+      reviewForm.limpieza === 0 ||
+      reviewForm.atencion === 0 ||
+      reviewForm.ambiente === 0
+    ) {
+      alert("Por favor, completa todos los campos de la reseña.");
       return;
     }
 
@@ -119,6 +151,7 @@ const Restaurants = () => {
       .then(() => {
         alert("Reseña enviada exitosamente");
         closeReviewModal();
+        loadRestaurants(); // Refrescar los datos de los restaurantes
       })
       .catch((error) => {
         console.error("Error al enviar la reseña:", error);
@@ -130,7 +163,7 @@ const Restaurants = () => {
     <div className="container mt-4 restaurants-container">
       <h1 className="mb-4 text-accent">Explora los Sabores de tu Ciudad</h1>
       {loading ? (
-        <p className="text-secondary">Cargando ubicación...</p>
+        <p className="text-secondary">Cargando ubicación y restaurantes...</p>
       ) : (
         <MapContainer
           center={[location.lat, location.lng]}
@@ -141,9 +174,11 @@ const Restaurants = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"
           />
+          {/* Marker para la ubicación del usuario */}
           <Marker position={[location.lat, location.lng]} icon={locationIcon}>
             <Popup>Tu ubicación actual</Popup>
           </Marker>
+          {/* Markers para los restaurantes */}
           {restaurantsData.map((restaurant) => (
             <Marker
               key={restaurant.id}
@@ -245,26 +280,31 @@ const Restaurants = () => {
                     </option>
                   ))}
               </select>
-              {["abundancia", "sabor", "calidadPrecio", "limpieza", "atencion", "ambiente"].map(
-                (field) => (
-                  <div key={field} className="star-rating-container">
-                    <label>{field}</label>
-                    <div className="star-rating">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <span
-                          key={star}
-                          className={`star ${
-                            reviewForm[field] >= star ? "selected" : "unselected"
-                          }`}
-                          onClick={() => handleStarClick(field, star)}
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </div>
+              {[
+                "abundancia",
+                "sabor",
+                "calidadPrecio",
+                "limpieza",
+                "atencion",
+                "ambiente",
+              ].map((field) => (
+                <div key={field} className="star-rating-container">
+                  <label>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                  <div className="star-rating">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`star ${
+                          reviewForm[field] >= star ? "selected" : "unselected"
+                        }`}
+                        onClick={() => handleStarClick(field, star)}
+                      >
+                        ★
+                      </span>
+                    ))}
                   </div>
-                )
-              )}
+                </div>
+              ))}
               <div className="buttons-container">
                 <button
                   type="button"

@@ -34,7 +34,7 @@ class Restaurant(models.Model):
     hours = models.CharField(max_length=50)
     phone = models.CharField(max_length=20)
     visited = models.BooleanField(default=False)
-    rating = models.IntegerField(default=0)
+    rating = models.FloatField(default=0.0)  # Cambiado de IntegerField a FloatField
 
     def __str__(self):
         return self.name
@@ -60,12 +60,12 @@ class Review(models.Model):
     restaurant = models.ForeignKey(Restaurant, related_name='reviews', on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comida = models.CharField(max_length=100)
-    abundancia = models.IntegerField()
-    sabor = models.IntegerField()
-    calidadPrecio = models.IntegerField()
-    limpieza = models.IntegerField()
-    atencion = models.IntegerField()
-    ambiente = models.IntegerField()
+    abundancia = models.FloatField(default=0.0)  # Cambiado de IntegerField a FloatField
+    sabor = models.FloatField(default=0.0)  # Cambiado de IntegerField a FloatField
+    calidadPrecio = models.FloatField(default=0.0)  # Cambiado de IntegerField a FloatField
+    limpieza = models.FloatField(default=0.0)  # Cambiado de IntegerField a FloatField
+    atencion = models.FloatField(default=0.0)  # Cambiado de IntegerField a FloatField
+    ambiente = models.FloatField(default=0.0)  # Cambiado de IntegerField a FloatField
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

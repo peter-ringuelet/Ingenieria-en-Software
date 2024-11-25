@@ -28,22 +28,38 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Verificar si las contraseñas coinciden
     if (formData.password !== formData.confirmPassword) {
       setError("Las contraseñas no coinciden.");
       return;
     }
 
     try {
-      await register(
-        formData.username,
-        formData.email,
-        formData.password
-      );
-      navigate("/login"); // Redirige al login si el registro es exitoso
+      // Llama a la función de registro
+      await register(formData.username, formData.email, formData.password);
+
+      // Si el registro es exitoso, redirige al login
+      navigate("/login");
     } catch (err) {
-      setError(err.message || "Hubo un error al registrarte. Inténtalo nuevamente.");
+      // Manejar errores específicos del backend
+      if (err.response && err.response.status === 400) {
+        // Busca los mensajes de error específicos para username o email
+        const errorData = err.response.data;
+        if (errorData.username) {
+          setError(errorData.username[0]); // Mensaje de error del servidor para username
+        } else if (errorData.email) {
+          setError(errorData.email[0]); // Mensaje de error del servidor para email
+        } else {
+          setError("Datos inválidos. Revisa la información ingresada.");
+        }
+      } else {
+        // Error genérico o problemas de red
+        setError(err.message || "Hubo un error al registrarte. Inténtalo nuevamente.");
+      }
     }
   };
+
+
 
   return (
     <div className="register-container">

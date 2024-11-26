@@ -5,20 +5,16 @@ import axios from 'axios';
 // URL base de la API
 const API_URL = 'http://127.0.0.1:8000/api'; // Sin barra final
 
-
-
-// Crear una instancia de axios con el Content-Type por defecto
+// Crear una instancia de axios sin establecer 'Content-Type' por defecto
 const api = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // No establezcas 'Content-Type' aquí
 });
 
 // Interceptor de solicitudes para agregar el token de autorización
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token'); // Corregido a 'access_token'
     if (token) {
       config.headers['Authorization'] = 'Bearer ' + token;
     }
@@ -65,8 +61,6 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       const newAccessToken = await refreshToken();
       if (newAccessToken) {
-        // Actualizamos el header de autorización en la instancia 'api'
-        api.defaults.headers.common['Authorization'] = 'Bearer ' + newAccessToken;
         // Reintentamos la solicitud original con el nuevo token
         return api(originalRequest);
       }
@@ -86,6 +80,7 @@ export const register = async (username, email, password) => {
     const { access, refresh, user } = response.data;
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
+    // Actualizar el encabezado de autorización
     api.defaults.headers.common['Authorization'] = 'Bearer ' + access;
     window.dispatchEvent(new Event('authChange'));
     return user;
@@ -170,21 +165,11 @@ export const getProfile = async () => {
   }
 };
 
-export const updateProfile = async (profileData) => {
+// Función para actualizar el perfil
+export const updateProfile = async (formData) => {
   try {
-    const formData = new FormData();
-    formData.append('user.first_name', profileData.user.first_name);
-    formData.append('user.last_name', profileData.user.last_name);
-    formData.append('user.email', profileData.user.email);
-    formData.append('phone', profileData.phone);
-    if (profileData.avatar) {
-      formData.append('avatar', profileData.avatar); // Agrega la imagen
-    }
-
     const response = await api.put('/profile/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data', // Configura para manejar archivos
-      },
+      // No necesitas establecer 'Content-Type' manualmente
     });
     return response.data;
   } catch (error) {

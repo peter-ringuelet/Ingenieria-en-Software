@@ -5,6 +5,12 @@ from django.contrib.auth.models import User
 from .models import Profile, Restaurant, MenuItem, Review
 from django.db.models import Avg
 
+# api/serializers.py
+
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from .models import Profile
+
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)
@@ -14,17 +20,21 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name']
-        # Alternativamente, puedes usar 'read_only_fields'
-        # read_only_fields = ['username']
-
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    avatar = serializers.ImageField(required=False, allow_null=True)  # Permite manejar imágenes
+    avatar = serializers.ImageField(required=False, allow_null=True)
+    avatar_url = serializers.SerializerMethodField()  # Nuevo campo
 
     class Meta:
         model = Profile
-        fields = ['avatar', 'user', 'phone']
+        fields = ['avatar', 'avatar_url', 'user', 'phone']
+
+    def get_avatar_url(self, obj):
+        request = self.context.get('request')
+        if obj.avatar and hasattr(obj.avatar, 'url'):
+            return request.build_absolute_uri(obj.avatar.url)
+        return None
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
@@ -36,17 +46,20 @@ class ProfileSerializer(serializers.ModelSerializer):
         user.email = user_data.get('email', user.email)
         user.save()
 
-        # Actualizar el avatar
-        if 'avatar' in validated_data:
+        # Actualizar el avatar si se proporciona
+        avatar = validated_data.get('avatar', None)
+        if avatar:
             if instance.avatar:
                 instance.avatar.delete()  # Eliminar avatar anterior
-            instance.avatar = validated_data['avatar']
+            instance.avatar = avatar
 
         # Actualizar otros campos del perfil
         instance.phone = validated_data.get('phone', instance.phone)
         instance.save()
 
         return instance
+
+
 
 
 # Serializadores para MenuItem, Restaurant y Review permanecen sin cambios
@@ -154,3 +167,22 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+# api/views.py
+
+from rest_framework import generics, permissions
+from rest_framework.parsers import MultiPartParser, JSONParser
+from .serializers import ProfileSerializer
+
+class ProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, JSONParser]
+
+    def get_object(self):
+        return self.request.user.profile
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context

@@ -184,7 +184,6 @@ const Restaurants = () => {
 
     submitReview(reviewData)
       .then(() => {
-        alert("Reseña enviada exitosamente");
         closeReviewModal();
         loadReviews(); // Actualizar las reseñas
         loadRestaurants(); // Refrescar los datos de los restaurantes

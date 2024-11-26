@@ -1,3 +1,5 @@
+// src/components/Profile.js
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout, getProfile, updateProfile } from "../../services/api";
@@ -15,7 +17,7 @@ const Profile = () => {
     last_name: "",
     email: "",
     phone: "",
-    avatar: "",
+    avatar: null, // Cambiado de "" a null para representar ausencia de archivo
   });
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -31,7 +33,7 @@ const Profile = () => {
           last_name: data.user.last_name || "",
           email: data.user.email || "",
           phone: data.phone || "",
-          avatar: data.avatar || "",
+          avatar: null, // Inicialmente no hay un nuevo avatar seleccionado
         });
         setLoading(false);
       } catch (err) {
@@ -52,7 +54,7 @@ const Profile = () => {
       last_name: profileData.user.last_name || "",
       email: profileData.user.email || "",
       phone: profileData.phone || "",
-      avatar: profileData.avatar || "",
+      avatar: null, // Resetear el avatar al cancelar
     });
     setIsEditing(false);
     setError(null);
@@ -65,7 +67,7 @@ const Profile = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setFormData((prevFormData) => ({ ...prevFormData, avatar: file }));
+    setFormData((prevFormData) => ({ ...prevFormData, avatar: file || null }));
   };
 
   const handleLogout = () => {
@@ -73,45 +75,52 @@ const Profile = () => {
     navigate("/");
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    // Envía los datos del formulario al backend
-    const updatedData = await updateProfile({
-      user: {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-      },
-      phone: formData.phone,
-      avatar: formData.avatar, // Esto puede ser un archivo
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const form = new FormData();
+      form.append('user.first_name', formData.first_name);
+      form.append('user.last_name', formData.last_name);
+      form.append('user.email', formData.email);
+      form.append('phone', formData.phone);
+      
+      if (formData.avatar) { // Solo agrega avatar si es un archivo
+        form.append('avatar', formData.avatar);
+      }
 
-    // Actualiza los datos del perfil y del formulario
-    setProfileData(updatedData);
-    setFormData({
-      first_name: updatedData.user.first_name || "",
-      last_name: updatedData.user.last_name || "",
-      email: updatedData.user.email || "",
-      phone: updatedData.phone || "",
-      avatar: updatedData.avatar || "", // Asegúrate de que esta URL sea válida
-    });
+      const updatedData = await updateProfile(form);
 
-    setIsEditing(false);
-    setError(null);
-  } catch (err) {
-    console.error("Error al actualizar el perfil:", err);
-    setError("No se pudo actualizar el perfil.");
-  }
-};
+      setProfileData(updatedData);
+      setFormData({
+        first_name: updatedData.user.first_name || "",
+        last_name: updatedData.user.last_name || "",
+        email: updatedData.user.email || "",
+        phone: updatedData.phone || "",
+        avatar: null, // Resetear avatar después de la actualización
+      });
 
+      setIsEditing(false);
+      setError(null);
+    } catch (err) {
+      console.error("Error al actualizar el perfil:", err);
+      if (err.response && err.response.data) {
+        // Mostrar mensajes de error específicos del backend
+        setError(Object.values(err.response.data).flat().join(" "));
+      } else {
+        setError("No se pudo actualizar el perfil.");
+      }
+    }
+  };
 
   if (loading) return <div className="profile-container">Cargando...</div>;
   if (error && !isEditing)
     return <div className="profile-container"><p className="text-danger">{error}</p></div>;
 
-  const { avatar, first_name, last_name, email, phone } = formData;
-  const avatarUrl = avatar || "/images/default-avatar.png";
+  const { first_name, last_name, email, phone } = formData;
+  // Utilizar 'avatar_url' en lugar de 'avatar'
+  const avatarUrl = profileData && profileData.avatar_url 
+    ? profileData.avatar_url 
+    : "/images/default-avatar.png";
 
   return (
     <div className="profile-container">

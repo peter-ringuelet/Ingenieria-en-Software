@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/theme.css"; // Archivo global con colores y fuentes
 import "./Menu.css"; // Estilos específicos para el menú
+import { ReactComponent as LogoApp } from '../../FoodFans.svg';
 
 const Menu = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -26,7 +27,7 @@ const Menu = () => {
       <nav className="navbar navbar-expand-lg fixed-top">
         <div className="container">
           <Link className="navbar-brand brand" to="/restaurants">
-            Sabores
+            <LogoApp/>
           </Link>
           <button
             className="navbar-toggler"

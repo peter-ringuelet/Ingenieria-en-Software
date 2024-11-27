@@ -12,11 +12,9 @@
 
 /* Logo de la marca */
 .brand {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--accent-color);
-  text-transform: uppercase;
-  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  width: 100px;
 }
 
 .brand:hover,

@@ -26,13 +26,21 @@ class RegisterView(generics.CreateAPIView):
         })
 
 
+# api/views.py
+
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser, MultiPartParser]  # Agrega MultiPartParser
+    parser_classes = [MultiPartParser, JSONParser]
 
     def get_object(self):
         return self.request.user.profile
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request  # Asegurar que el contexto incluye la solicitud
+        return context
+
 
 
 class RestaurantViewSet(viewsets.ReadOnlyModelViewSet):

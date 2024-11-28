@@ -75,8 +75,18 @@ const Profile = () => {
     navigate("/");
   };
 
+// src/components/Profile.js
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validación básica del email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Por favor, introduce un correo electrónico válido.");
+      return;
+    }
+
     try {
       const form = new FormData();
       form.append('user.first_name', formData.first_name);
@@ -105,12 +115,20 @@ const Profile = () => {
       console.error("Error al actualizar el perfil:", err);
       if (err.response && err.response.data) {
         // Mostrar mensajes de error específicos del backend
-        setError(Object.values(err.response.data).flat().join(" "));
+        // Verificar si el error está en user.email
+        if (err.response.data.user && err.response.data.user.email) {
+          setError(err.response.data.user.email.join(" "));
+        } else if (err.response.data.email) {
+          setError(err.response.data.email.join(" "));
+        } else {
+          setError(Object.values(err.response.data).flat().join(" "));
+        }
       } else {
         setError("No se pudo actualizar el perfil.");
       }
     }
   };
+
 
   if (loading) return <div className="profile-container">Cargando...</div>;
   if (error && !isEditing)

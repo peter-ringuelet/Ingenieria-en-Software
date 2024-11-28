@@ -1,4 +1,5 @@
 # api/serializers.py
+# api/serializers.py
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -7,9 +8,6 @@ from django.db.models import Avg
 
 # api/serializers.py
 
-from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import Profile
 
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=False, allow_blank=True)
@@ -21,8 +19,22 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email', 'first_name', 'last_name']
 
+    def validate_email(self, value):
+        request = self.context.get('request')
+        user = request.user if request else None
+
+        if user is None:
+            raise serializers.ValidationError("Usuario no autenticado.")
+
+        if User.objects.filter(email=value).exclude(pk=user.pk).exists():
+            raise serializers.ValidationError("El correo electrónico ya está registrado. Inténtalo con otro.")
+        return value
+
+# api/serializers.py
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+
     avatar = serializers.ImageField(required=False, allow_null=True)
     avatar_url = serializers.SerializerMethodField()  # Nuevo campo
 
@@ -40,11 +52,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         user_data = validated_data.pop('user', {})
         user = instance.user
 
-        # Actualizar campos del usuario
-        user.first_name = user_data.get('first_name', user.first_name)
-        user.last_name = user_data.get('last_name', user.last_name)
-        user.email = user_data.get('email', user.email)
-        user.save()
+        # Instanciar el UserSerializer con el usuario actual y pasar el contexto
+        user_serializer = UserSerializer(instance=user, data=user_data, context=self.context, partial=True)
+        user_serializer.is_valid(raise_exception=True)
+        user_serializer.save()
 
         # Actualizar el avatar si se proporciona
         avatar = validated_data.get('avatar', None)
@@ -60,6 +71,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
+# Resto de los serializers permanecen sin cambios
 
 
 # Serializadores para MenuItem, Restaurant y Review permanecen sin cambios

@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { isAuthenticated } from "../../services/auth";
+import { ReactComponent as LogoApp } from '../../FoodFans.svg';
 import "./Home.css";
 
 const Home = () => {
@@ -13,7 +14,7 @@ const Home = () => {
     <div className="home-wrapper">
       {/* Sección izquierda */}
       <div className="home-left">
-        <h1 className="home-title">SABORES</h1>
+        <LogoApp style={{ width: '30rem', height: '30rem' }} />
         <p className="home-subtitle">
           Explora los mejores restaurantes y comparte tus experiencias.
         </p>

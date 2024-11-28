@@ -14,7 +14,7 @@ const Home = () => {
     <div className="home-wrapper">
       {/* Sección izquierda */}
       <div className="home-left">
-        <LogoApp style={{ width: '30rem', height: '30rem' }} />
+        <LogoApp style={{ width: '25rem', height: '25rem' }} />
         <p className="home-subtitle">
           Explora los mejores restaurantes y comparte tus experiencias.
         </p>

@@ -121,6 +121,9 @@ const Restaurants = () => {
 
       setSelectedMenu(groupedMenu);
     }
+    else{
+      alert("La carta no ha sido cargada");
+    }
   };
 
 

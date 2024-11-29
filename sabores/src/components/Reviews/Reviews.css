@@ -59,3 +59,8 @@
 .card-subtitle{
   color: var(--text-secondary);
 }
+
+.alerta{
+  text-align: center;
+  color: var(--text-primary);
+}

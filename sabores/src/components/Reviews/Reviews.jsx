@@ -35,8 +35,10 @@ const Reviews = () => {
 
   return (
     <div className="container review-container">
-      <h1 className="mb-4 text-accent">Reseñas de Restaurantes</h1>
-      {reviewsData.map((review) => (
+      <h1 className="mb-4 text-accent">Reseñas de Restaurantes</h1>   
+      {
+      reviewsData.length > 0 ? 
+      reviewsData.map((review) => (
         <div key={review.id} className="card shadow review-card mb-4">
           <div className="card-body">
             <h5 className="card-title">{review.restaurant_name}</h5>
@@ -73,7 +75,11 @@ const Reviews = () => {
             </p>
           </div>
         </div>
-      ))}
+      ))
+    : <p className="alerta">Aún no se han cargado reseñas</p>
+
+
+    }
     </div>
   );
 };
